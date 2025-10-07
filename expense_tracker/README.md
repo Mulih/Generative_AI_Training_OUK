@@ -1,8 +1,6 @@
-(# Expense Tracker (Jac))
+# Expense Tracker (Jac)
 
 This repository contains a small expense-tracking example implemented using the Jac programming language for the backend logic and a Streamlit-based frontend. The project demonstrates a Walker-based API implemented in `expense_manager.jac` and a frontend interface in `frontend.jac` that talks to the walker over HTTP.
-
-This README documents the code, the runtime interactions (HTTP payloads and expected responses), development notes, and a short note about an in-progress anomaly detection feature that will leverage Jac's AI capabilities.
 
 ## Repository structure
 
