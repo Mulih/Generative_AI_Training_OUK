@@ -1,7 +1,7 @@
 # expense_manager.jac
 import from datetime { datetime, date }
 
-# Expense nde
+# Expense node
 node Expense {
     has id: int = 0;
     has description: str = "";
@@ -16,7 +16,7 @@ node ExpenseHandling {
 
     # Helper function
     def iso_now() -> str {
-        return (str(datetime.now()));
+        return str(datetime.now());
     }
 
     # Add an expense
@@ -33,7 +33,7 @@ node ExpenseHandling {
 
     # List expenses
     def list_expenses() -> list {
-        results = [];
+        result = [];
         for e in [self --> (`?Expense)] {
             result.append({"id": e.id, "description": e.description, "amount": e.amount, "date": e.date});
         }
@@ -60,7 +60,7 @@ node ExpenseHandling {
         deleted = False;
         for e in [self --> (`?Expense)] {
             if e.id == id {
-                deleted_amount = deleted_amount + x.amount;
+                deleted_amount = deleted_amount + e.amount;
                 deleted = true;
             } else {
                 kept.append(e);
@@ -99,17 +99,32 @@ node ExpenseHandling {
     can execute with expense_manager entry {
         print("[ExpenseHandling node activated]");
         action = visitor.action;
-        payload = visitor.paylod;
+        payload = visitor.payload;
 
-        if act == "add" {
+        if action == "add" {
             description = payload.get("description", "");
             amount = payload.get("amount", 0.0);
             date = payload.get("date", "");
             visitor.response = self.add_expense(description, amount, date);
             visitor.node_type = "add";
-        } elif act == "list" {
+        } elif action == "list" {
             visitor.response = {"expenses": self.list_expenses()};
             visitor.node_type = "list";
+        } elif action == "update" {
+            id = payload.get("id", 0);
+            amount = payload.get("amount", 0.0);
+            visitor.response = self.update_expense(id, amount);
+            visitor.node_type = "update";
+        } elif action == "delete" {
+            id = payload.get("id", 0);
+            visitor.response = self.delete_expense(id);
+            visitor.node_type = "delete";
+        } elif action == "summary" {
+            month = payload.get("month", 0);
+            visitor.response = self.summary(month);
+            visitor.node_type = "summary";
+        } else {
+            visitor.response = {"status":"error", "message": "unknown action"}
         }
     }
 
@@ -118,7 +133,6 @@ node ExpenseHandling {
         has action: str = "";
         has payload: dict = {};
         has response: dict = {};
-        has node_type: str = "";
         has node_type: str = "";
 
         can execute with `root entry {
