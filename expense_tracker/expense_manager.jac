@@ -107,6 +107,9 @@ node ExpenseHandling {
             date = payload.get("date", "");
             visitor.response = self.add_expense(description, amount, date);
             visitor.node_type = "add";
+        } elif act == "list" {
+            visitor.response = {"expenses": self.list_expenses()};
+            visitor.node_type = "list";
         }
     }
 
