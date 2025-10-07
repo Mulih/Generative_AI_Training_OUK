@@ -36,4 +36,15 @@ with entry {
     tabs = st.tabs(["Add", "List", "Update", "Delete", "Summary"]);
 
     # Add
+    with tabs[0] {
+        st.header("Add Expense");
+        description = st.text_input("Description");
+        amount = st.number_input("Amount", min_value=0.0, fomart="%f");
+        date_in = st.text_input("Date (optional, ISO)", value="");
+        if st.button("Add Expense") {
+            payload = {"description": description, "amount": float(amount), "date": date_in};
+            response = call_backend("add", payload);
+            st.write(response);
+        }
+    }
 }
