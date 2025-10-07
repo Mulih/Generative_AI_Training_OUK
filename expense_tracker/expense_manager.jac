@@ -52,4 +52,23 @@ node ExpenseHandling {
         }
         return {"status":"error", "message":"expense not found", "id": id};
     }
+
+    # Walker that the frontend will call
+    walker expense_manager {
+        has action: str = "";
+        has payload: dict = {};
+        has response: dict = {};
+        has node_type: str = "";
+        has node_type: str = "";
+
+        can execute with `root entry {
+            handler = here ++> ExpenseHandling();
+            visit handler;
+            report {
+                "action": self.action,
+                "node_type": self.node_type,
+                "response": self.response
+            };
+        }
+    }
 }
