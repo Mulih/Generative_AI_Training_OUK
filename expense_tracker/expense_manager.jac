@@ -95,6 +95,9 @@ node ExpenseHandling {
         }
     }
 
+    # detect anomalies
+    # TO-DO
+
     # Ability that runs when the walker visits node
     can execute with expense_manager entry {
         print("[ExpenseHandling node activated]");
@@ -124,25 +127,25 @@ node ExpenseHandling {
             visitor.response = self.summary(month);
             visitor.node_type = "summary";
         } else {
-            visitor.response = {"status":"error", "message": "unknown action"}
+            visitor.response = {"status":"error", "message": "unknown action"};
         }
     }
+}
 
-    # Walker that the frontend will call
-    walker expense_manager {
-        has action: str = "";
-        has payload: dict = {};
-        has response: dict = {};
-        has node_type: str = "";
+# Walker that the frontend will call
+walker expense_manager {
+    has action: str = "";
+    has payload: dict = {};
+    has response: dict = {};
+    has node_type: str = "";
 
-        can execute with `root entry {
-            handler = here ++> ExpenseHandling();
-            visit handler;
-            report {
-                "action": self.action,
-                "node_type": self.node_type,
-                "response": self.response
-            };
-        }
+    can execute with `root entry {
+        handler = here ++> ExpenseHandling();
+        visit handler;
+        report {
+            "action": self.action,
+            "node_type": self.node_type,
+            "response": self.response
+        };
     }
 }

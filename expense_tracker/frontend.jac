@@ -91,4 +91,15 @@ with entry {
             st.write(response);
         }
     }
+
+    # Summary
+    with tabs[4] {
+        st.header("Summary");
+        month = st.number_input("Month (1-12) - 0 for all", min_value=0, max_value=12, step=1, key="month");
+        if st.button("Get Summary") {
+            response = call_backend("summary", {"month": int(month)});
+        }
+    }
+
+    st.markdown("---");
 }
