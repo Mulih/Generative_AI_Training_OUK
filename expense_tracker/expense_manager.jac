@@ -18,4 +18,16 @@ node ExpenseHandling {
     def iso_now() -> {
         return str(now());
     }
+
+    # Add an expense
+    def add_expense(description: str, amount: float, expense_date: str = "") -> dict {
+        if expense_date == "" {
+            expense_Date = self.iso_now();
+        }
+        exp = Expense(id=self.next_id, description=description, amount=amount, date=expense_date);
+        self ++> exp;
+        self.next_id = self.next_id + 1;
+        self.total = self.total + amount;
+        return {"status": "ok", "id": exp.id, "description": exp.description, "amount": exp.amount, "date": exp.date};
+    }
 }
