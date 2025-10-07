@@ -74,5 +74,21 @@ with entry {
     # Update
     with tabs[2] {
         st.header("Update Expense");
+        upd_id = st.number_input("Expense ID", min_value=1, step=1, key="upd_id");
+        upd_amount = st.number_input("New amount", min_value=0.0, format="%f", key="upd_amount");
+        if st.button("Update Expense") {
+            response = call_backend("update", {"id": int(upd_id), "amount": float(upd_amount)});
+            st.write(response);
+        }
+    }
+
+    # Delete
+    with tabs[3] {
+        st.header("Delete Expense");
+        del_id = st.number_input("Expense ID to delete", min_value=1, step=1, key="del_id");
+        if st.button("Delete Expense") {
+            response = call_backend("delete", {"id": int(del_id)});
+            st.write(response);
+        }
     }
 }
