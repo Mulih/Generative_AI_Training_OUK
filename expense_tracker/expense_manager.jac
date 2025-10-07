@@ -53,6 +53,47 @@ node ExpenseHandling {
         return {"status":"error", "message":"expense not found", "id": id};
     }
 
+    # Delete an expense
+    def delete_expense(id: int) -> dict {
+        kept = [];
+        deleted_amount = 0.0;
+        deleted = False;
+        for e in [self --> (`?Expense)] {
+            if e.id == id {
+                deleted_amount = deleted_amount + x.amount;
+                deleted = true;
+            } else {
+                kept.append(e);
+            }
+        }
+
+        if not deleted {
+            return {"status": "error", "message": "expense not found", "id": id};
+        }
+    }
+
+    # Summary for specified month
+    def summary(month: int = 0) -> dict {
+        total = 0.0;
+        rows = [];
+        for e in [self --> (`?Expense)] {
+            try {
+                mon = int(Str(e.date)[5:7]);
+            } catch {
+                mon = 0;
+            }
+            if month == 0 or mon == month {
+                total = total + e.amount;
+                rows.append({"id": e.id, "description": e.description, "amount": e.amount, "date": e.date});
+            }
+        }
+        if month == 0 {
+            return {"total": total, "expenses": rows};
+        } else {
+            return {"month": month, "total": total, "expenses": rows};
+        }
+    }
+
     # Walker that the frontend will call
     walker expense_manager {
         has action: str = "";
