@@ -35,16 +35,44 @@ with entry {
 
     tabs = st.tabs(["Add", "List", "Update", "Delete", "Summary"]);
 
+    if not st.session_state.get("expenses")  {
+            st.session_state.expenses = [];
+    }
+
     # Add
     with tabs[0] {
         st.header("Add Expense");
         description = st.text_input("Description");
-        amount = st.number_input("Amount", min_value=0.0, fomart="%f");
+        amount = st.number_input("Amount", min_value=0.0, format="%f");
         date_in = st.text_input("Date (optional, ISO)", value="");
         if st.button("Add Expense") {
             payload = {"description": description, "amount": float(amount), "date": date_in};
             response = call_backend("add", payload);
             st.write(response);
         }
+    }
+
+    # List
+    with tabs[1] {
+        st.header("List Expenses");
+        if st.button("Refresh") {
+            response = call_backend("list", {});
+            if response.get("expenses") != None {
+                st.session_state.expenses = response.get("expenses");
+            } elif isinstance(response, list) {
+                st.session_state.expenses = response;
+            } else {
+                st.session_state.expenses = [];
+            }
+        }
+
+        for exp in st.session_state.expenses {
+            st.write(f"ID: {exp.get('id')} - {exp.get('description')} - ${exp.get('amount')} - {exp.get('date')}");
+        }
+    }
+
+    # Update
+    with tabs[2] {
+        st.header("Update Expense");
     }
 }
