@@ -1,5 +1,5 @@
 # expense_manager.jac
-import from datetime { now, date };
+import from datetime { datetime, date }
 
 # Expense nde
 node Expense {
@@ -15,14 +15,14 @@ node ExpenseHandling {
     has total: float = 0.0;
 
     # Helper function
-    def iso_now() -> {
-        return str(now());
+    def iso_now() -> str {
+        return (str(datetime.now()));
     }
 
     # Add an expense
     def add_expense(description: str, amount: float, expense_date: str = "") -> dict {
         if expense_date == "" {
-            expense_Date = self.iso_now();
+            expense_date = self.iso_now();
         }
         exp = Expense(id=self.next_id, description=description, amount=amount, date=expense_date);
         self ++> exp;
@@ -78,9 +78,10 @@ node ExpenseHandling {
         rows = [];
         for e in [self --> (`?Expense)] {
             try {
-                mon = int(Str(e.date)[5:7]);
-            } catch {
+                mon = int(str(e.date)[5:7]);
+            } except Exception as e {
                 mon = 0;
+                return f"Error: {e}";
             }
             if month == 0 or mon == month {
                 total = total + e.amount;
@@ -91,6 +92,21 @@ node ExpenseHandling {
             return {"total": total, "expenses": rows};
         } else {
             return {"month": month, "total": total, "expenses": rows};
+        }
+    }
+
+    # Ability that runs when the walker visits node
+    can execute with expense_manager entry {
+        print("[ExpenseHandling node activated]");
+        action = visitor.action;
+        payload = visitor.paylod;
+
+        if act == "add" {
+            description = payload.get("description", "");
+            amount = payload.get("amount", 0.0);
+            date = payload.get("date", "");
+            visitor.response = self.add_expense(description, amount, date);
+            visitor.node_type = "add";
         }
     }
 
