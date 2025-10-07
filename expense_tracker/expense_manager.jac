@@ -30,4 +30,26 @@ node ExpenseHandling {
         self.total = self.total + amount;
         return {"status": "ok", "id": exp.id, "description": exp.description, "amount": exp.amount, "date": exp.date};
     }
+
+    # List expenses
+    def list_expenses() -> list {
+        results = [];
+        for e in [self --> (`?Expense)] {
+            result.append({"id": e.id, "description": e.description, "amount": e.amount, "date": e.date});
+        }
+        return result;
+    }
+
+    # update an expense
+    def update_expense(id: int, amount: float) -> dict {
+        for e in [self --> (`?Expense)] {
+            if e.id == id {
+                old = e.amount;
+                e.amount = amount;
+                self.total = self.total - old + amount;
+                return {"status":"ok", "id": id, "old amount": old, "new amount": amount};
+            }
+        }
+        return {"status":"error", "message":"expense not found", "id": id};
+    }
 }
